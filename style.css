@@ -149,3 +149,25 @@ input:focus:-ms-input-placeholder {
   color: white;
   background-color: #d73938;
 }
+
+.customer_feedback h1{
+  font-size: 32px;
+  font-weight: 600;
+  text-align: center;
+  text-transform: uppercase;
+  margin-top: 50px;
+  margin-right: 20cm;
+}
+
+.customer_feedback table{
+  margin-top: 50px;
+  margin-right: 10cm;
+}
+
+.customer_feedback tr{
+  font-size: 18px;
+  font-weight: 600;
+  text-align: left;
+  margin-top: 50px;
+  margin-right: 20cm;
+}
