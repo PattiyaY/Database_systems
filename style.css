@@ -171,3 +171,17 @@ input:focus:-ms-input-placeholder {
   margin-top: 50px;
   margin-right: 20cm;
 }
+
+.customer_feedback th{
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 50px;
+  margin-right: 20cm;
+}
+
+.customer_feedback td{
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 50px;
+  margin-right: 20cm;
+}
