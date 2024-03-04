@@ -251,6 +251,12 @@ DELETE FROM in_house WHERE depart_date = CURDATE();
 /* Query */
 /* Query - General Manager */
 /* Query - Customer */
+-- Customer part --
+-- Sign up --
+INSERT INTO `account`(`email`, `password`, `firstname`, `lastname`, `address`, `birthdate`, `phone`) VALUES ($email, $userPassword, $name, $surname, $address, $dob, $phone);
+
+-- Login check exist account --
+SELECT * FROM account WHERE email = $email AND password = $userPassword;
 /* Query - Reservation Staff */
 
 
@@ -310,13 +316,23 @@ DELETE FROM in_house WHERE depart_date = CURDATE();
             DELETE FROM in_house
             WHERE reservation_no = $reservation_no;
 
-    /* f_checkout_inhouse */
-        SELECT reservation_no, email, firstname, lastname, agent, total_room, arrive_date, depart_date
-        FROM reservation JOIN customer USING(email) JOIN account USING(email)
-        WHERE depart_date > CURDATE() AND reservation_no IN (SELECT reservation_no FROM in_house)
-        ORDER BY arrive_date ASC;
-        /* f_checkout_waiting_select */
-        /*Same as f_checkin_inhouse_select for
-          Fecth the selected reservation information
-          Fecth room numbers associated with the selected reservation
-          Fecth paid amount associated with the selected reservation */
+/* checkout_inhouse */
+SELECT reservation_no, email, firstname, lastname, agent, total_room, arrive_date, depart_date
+FROM reservation JOIN customer USING(email) JOIN account USING(email)
+WHERE depart_date > CURDATE() AND reservation_no IN (SELECT reservation_no FROM in_house)
+ORDER BY arrive_date ASC;
+
+
+
+
+
+/* f_checkout_inhouse */
+    SELECT reservation_no, email, firstname, lastname, agent, total_room, arrive_date, depart_date
+    FROM reservation JOIN customer USING(email) JOIN account USING(email)
+    WHERE depart_date > CURDATE() AND reservation_no IN (SELECT reservation_no FROM in_house)
+    ORDER BY arrive_date ASC;
+    /* f_checkout_waiting_select */
+    /*Same as f_checkin_inhouse_select for
+        Fecth the selected reservation information
+        Fecth room numbers associated with the selected reservation
+        Fecth paid amount associated with the selected reservation */
