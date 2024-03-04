@@ -126,7 +126,7 @@ $result_customer_data = $stmt_customer_data->get_result();
               <td class="list-td" style="text-align: left;"><?php echo $row_customer_data['reservation_no'];?></td>
 
               <td class="list-td" style="text-align: left;">
-                <a href="r_reservation.php? reservation_id=<?php echo $row_customer_data["email"];?>#popup-info"><?php echo $row_customer_data['firstname'], " ", $row_customer_data['lastname'];?></a>
+                <a href="r_reservation.php? email=<?php echo $row_customer_data["email"];?>#popup-info"><?php echo $row_customer_data['firstname'], " ", $row_customer_data['lastname'];?></a>
               </td>
               <td class="list-td" style="text-align: center;"><?php echo $row_customer_data['agent'];?></td>
               <td class="list-td" style="text-align: center;"><?php echo date('d/m/y', strtotime($row_customer_data['arrive_date']));?></td>
@@ -224,7 +224,7 @@ $result_customer_data = $stmt_customer_data->get_result();
       <div class="popup-box">
         <div class="container">
           <div class="title"><h3>Edit Reservation</h3></div>
-          <form action="r_edit_db.php?reservation_id=<?php echo isset($editResult['reservation_no']) ? $editResult['reservation_no'] : ''; ?>" name="reservation_no" method="post">
+          <form action="r_edit_db.php?reservation_no=<?php echo isset($editResult['reservation_no']) ? $editResult['reservation_no'] : ''; ?>" name="reservation_no" method="post">
             <div class="list-details">
               <div class="column1">
                 <div class="input-box">
@@ -271,7 +271,7 @@ $result_customer_data = $stmt_customer_data->get_result();
 
             </div>
             <div class="popup-edit-button">
-              <a href="r_delete.php?reservation_id=<?php echo isset($editResult['email']) ? $editResult['email'] : ''; ?>" class="reservation-button-black">Delete</a>
+              <a href="r_delete.php?email=<?php echo isset($editResult['email']) ? $editResult['email'] : ''; ?>" class="reservation-button-black">Delete</a>
               <input type="submit" value="Edit" class="reservation-button-red">
               <a href="r_reservation.php" class="reservation-button-black">Cancel</a>
             </div>
@@ -283,9 +283,9 @@ $result_customer_data = $stmt_customer_data->get_result();
 
     <?php
      require_once('./r_db.php');
-     $reservation_id = isset($_GET["reservation_id"]) ? $_GET["reservation_id"] : null;
+     $reservation_id = isset($_GET["reservation_no"]) ? $_GET["reservation_no"] : null;
      if ($reservation_id) {
-      $stmt = $conn->prepare("SELECT * FROM reservation WHERE reservation_id = ?");
+      $stmt = $conn->prepare("SELECT * FROM `reservation` AS r and `account` as a WHERE reservation_no = ? AND r.email=a.email");
       $stmt->bind_param("i", $reservation_id);
       $stmt->execute();
       $result = $stmt->get_result();
@@ -293,7 +293,7 @@ $result_customer_data = $stmt_customer_data->get_result();
       if ($result->num_rows > 0) {
           $readResult = $result->fetch_assoc();
       } else {
-          echo "Reservation ID not found: " . $_GET["reservation_id"];
+          echo "Reservation ID not found: " . $_GET["reservation_no"];
       }
   
       $stmt->close();
@@ -307,7 +307,7 @@ $result_customer_data = $stmt_customer_data->get_result();
               <div class="column1">
                 <div class="list-info-box">
                   <dt class="list-dt">Reservation No.</dt>
-                  <dd class="list-dd"><?php echo $readResult['reservation_id'];?></dd>
+                  <dd class="list-dd"><?php echo $readResult['reservation_no'];?></dd>
                 </div>
                 <div class="list-info-box">
                   <dt class="list-dt">Email</dt>
@@ -317,7 +317,7 @@ $result_customer_data = $stmt_customer_data->get_result();
               
               <div class="list-info-box">
                 <dt class="list-dt">Customer Name</dt>
-                <dd class="list-dd"><?php echo $readResult['customer_name']; ?></dd>
+                <dd class="list-dd"><?php echo $readResult['firstname'],$readResult['lastname']; ?></dd>
               </div>
 
               <div class="column2">
@@ -328,9 +328,7 @@ $result_customer_data = $stmt_customer_data->get_result();
                 <div class="list-info-box">
                   <dt class="list-dt">Room No.</dt>
                   <div class="column3">
-                    <dd class="list-dd"><?php echo $readResult['sta_room_no']; ?></dd>
-                    <b>-</b>
-                    <dd class="list-dd"><?php echo $readResult['end_room_no']; ?></dd>
+                    <dd class="list-dd"><?php echo $readResult['room_no']; ?></dd>
                   </div>
                 </div>
               </div>
