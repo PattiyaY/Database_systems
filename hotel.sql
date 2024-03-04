@@ -278,3 +278,15 @@ SELECT reservation_no, email, firstname, lastname, agent, total_room, arrive_dat
 FROM reservation JOIN customer USING(email) JOIN account USING(email)
 WHERE depart_date > CURDATE() AND reservation_no IN (SELECT reservation_no FROM in_house)
 ORDER BY arrive_date ASC;
+
+
+
+
+
+
+-- Customer part --
+-- Sign up --
+INSERT INTO `account`(`email`, `password`, `firstname`, `lastname`, `address`, `birthdate`, `phone`) VALUES ($email, $userPassword, $name, $surname, $address, $dob, $phone);
+
+-- Login check exist account --
+SELECT * FROM account WHERE email = $email AND password = $userPassword;
