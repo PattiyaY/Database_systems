@@ -1,15 +1,25 @@
 <?php
 require './DB_connect.php';
-
-$email = isset($_GET['email']);
-$sql_accounts = "SELECT *
-FROM `account` AS a, `employee` AS e WHERE a.email= e.email AND a.email= ? ORDER BY a.firstname ASC";
-$stmt_accounts = $conn->prepare($sql_accounts);
-$stmt1->bind_param("s",$email);
-$stmt_accounts->execute();
-$result_accounts = $stmt_accounts->get_result();
-$row_employee = mysqli_fetch_array($result_accounts);
-$rowcount = mysqli_num_rows($result_accounts);
+/*
+    //Account table
+    $email = $_SESSION['email'];
+    $sql_account = "SELECT * FROM `account` WHERE email = ?";
+    $stmt_account = $conn->prepare($sql_account);
+    $stmt_account->bind_param("s", $email);
+    $stmt_account->execute();
+    $result_account = $stmt_account->get_result();
+    $row_account = mysqli_fetch_array($result_account);
+    
+    //Employee table
+    $sql_employee = "SELECT * FROM `employee` WHERE email = ?";
+    $stmt = $conn->prepare($sql_employee);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result_employee = $stmt->get_result();
+    $row_employee = mysqli_fetch_array($result_employee);
+*/
+    $sql_accounts = "SELECT *
+    FROM `account` AS a, `employee` AS e WHERE a.email= e.email AND a.email= ? ORDER BY a.firstname ASC";
 ?>
 
 <!DOCTYPE html>
@@ -46,7 +56,26 @@ $rowcount = mysqli_num_rows($result_accounts);
       </nav>
     </div>
 
-    <form action="./mg_db_edit_account_manager.php" method="POST" class="table-customer-info">
+
+    <?php
+     require_once('./DB_connect.php');
+     $email = isset($_GET["email"]) ? $_GET["email"] : null;
+     if ($email) {
+      $stmt = $conn->prepare("SELECT * FROM `account` AS a, `employee` AS e WHERE a.email= e.email AND a.email= ? ORDER BY a.firstname ASC");
+      $stmt->bind_param("s", $email);
+      $stmt->execute();
+      $result = $stmt->get_result();
+  
+      if ($result->num_rows > 0) {
+          $editResult = $result->fetch_assoc();
+      } else {
+          echo "email not found: " . $_GET["email"];
+      }
+  
+      $stmt->close();
+     }
+    ?>
+    <form action="./mg_db_edit_account_manager.php" method="post">
       <h1 class="title_customer">edit personal information</h1>
       <div class="account-info">
 
@@ -67,7 +96,7 @@ $rowcount = mysqli_num_rows($result_accounts);
             <input type="text"
             id="firstname"
             name="firstname"
-            value="<?php echo $row_employee['firstname']; ?>"
+            value="<?php echo $editResult['firstname']; ?>"
             >
             </p>
           </td>
@@ -81,7 +110,7 @@ $rowcount = mysqli_num_rows($result_accounts);
               type="text"
               id="address"
               name="address"
-              value="<?php echo $row_employee['address']; ?>"
+              value="<?php echo $editResult['address']; ?>"
               />
               </p>
             </td>
@@ -93,7 +122,7 @@ $rowcount = mysqli_num_rows($result_accounts);
               <input type="text"
               id="lastname"
               name="lastname"
-              value="<?php echo $row_employee['lastname']; ?>"
+              value="<?php echo $editResult['lastname']; ?>"
               >
               </p>
             <!-- Email Input Slot -->
@@ -101,7 +130,7 @@ $rowcount = mysqli_num_rows($result_accounts);
               <input type="text"
               id="email" 
               name="email"
-              value="<?php echo $row_employee['email']; ?>"
+              value="<?php echo $editResult['email']; ?>"
               >
               </p>
             </tr>
@@ -121,7 +150,7 @@ $rowcount = mysqli_num_rows($result_accounts);
                 <input type="date"
                 id="birthdate"
                 name="birthdate"
-                value="<?php echo $row_employee['birthdate']; ?>"
+                value="<?php echo $editResult['birthdate']; ?>"
                 >
                 </p>
               </td>
@@ -131,7 +160,7 @@ $rowcount = mysqli_num_rows($result_accounts);
                 <input type="text"
                   id="password"
                   name="password"
-                  value="<?php echo $row_employee['password']; ?>"
+                  value="<?php echo $editResult['password']; ?>"
                   >
                  </p>
               </td>
@@ -146,8 +175,8 @@ $rowcount = mysqli_num_rows($result_accounts);
                 <!-- Roles options -->
                 <p class="body">
                   <select id="role" name="role" style="font-size: 50px; ">
-                  <option value="Reservation Staff">Reservation Staff</option>
-                  <option value="Front Desk Staff">Front Desk Staff</option>
+                  <option value="Reservation Staff" <?php if ($editResult['role'] == "Reservation Staff") echo "selected"; ?>>>Reservation Staff</option>
+                  <option value="Front Desk Staff" <?php if ($editResult['role'] == "Front Desk Staff") echo "selected"; ?>>>Front Desk Staff</option>
                   </select>
                 </p>
               </td>
@@ -161,17 +190,18 @@ $rowcount = mysqli_num_rows($result_accounts);
                 <input type="text"
                 id="phone"
                 name="phone"
-                value="<?php echo $row_employee['phone']; ?>"
+                value="<?php echo $editResult['phone']; ?>"
                 >
                 </p>
               </td>
             </tr>
       </table>
         <div class="edit-personal-info">
-        <a href="./mg_account_manager.php"><p class="account">cancel</p> </a>
+          <a href="./mg_account_manager.php"><p class="account">cancel</p></a>
           <!-- link to edit page -->
-          <button type="submit" name="submit" class="button">Done</button>
-          </a>
+          <!--<button type="submit" name="submit" class="button">Done</button>-->
+          <input type="submit" value="Done" class="reservation-button-red">
+          <input type="hidden" name="email" value="<?php echo $email; ?>">
         </div>
       </form>
 </body>
