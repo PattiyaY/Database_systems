@@ -126,8 +126,9 @@ $result_customer_data = $stmt_customer_data->get_result();
               <td class="list-td" style="text-align: left;"><?php echo $row_customer_data['reservation_no'];?></td>
 
               <td class="list-td" style="text-align: left;">
-                <a href="r_reservation.php? email=<?php echo $row_customer_data["email"];?>#popup-info"><?php echo $row_customer_data['firstname'], " ", $row_customer_data['lastname'];?></a>
+                <a href="r_reservation.php?email=<?php echo $row_customer_data["email"];?>#popup-info"><?php echo $row_customer_data['firstname'], " ", $row_customer_data['lastname'];?></a>
               </td>
+
               <td class="list-td" style="text-align: center;"><?php echo $row_customer_data['agent'];?></td>
               <td class="list-td" style="text-align: center;"><?php echo date('d/m/y', strtotime($row_customer_data['arrive_date']));?></td>
               <td class="list-td" style="text-align: center;"><?php echo date('d/m/y', strtotime($row_customer_data['depart_date']));?></td>
@@ -282,23 +283,30 @@ $result_customer_data = $stmt_customer_data->get_result();
 
 
     <?php
-     require_once('./r_db.php');
-     $reservation_id = isset($_GET["reservation_no"]) ? $_GET["reservation_no"] : null;
-     if ($reservation_id) {
-      $stmt = $conn->prepare("SELECT * FROM `reservation` AS r and `account` as a WHERE reservation_no = ? AND r.email=a.email");
-      $stmt->bind_param("i", $reservation_id);
+     require_once('./DB_connect.php');
+     $email = isset($_GET["email"]) ? $_GET["email"] : null;
+     if ($email) {
+      $stmt = $conn->prepare("SELECT * FROM `reservation` AS r, `account` AS a WHERE a.email = ? AND r.email=a.email");
+      $stmt->bind_param("s", $email);
       $stmt->execute();
       $result = $stmt->get_result();
-  
+
       if ($result->num_rows > 0) {
           $readResult = $result->fetch_assoc();
       } else {
-          echo "Reservation ID not found: " . $_GET["reservation_no"];
+          echo "email not found: " . $_GET["email"];
       }
-  
+ 
+      $rev_no = $readResult['reservation_no'];
+      $sql_reserved_room = "SELECT * FROM `reserved_room` WHERE reservation_no = ?";
+      $stmt_reserved_room = $conn->prepare($sql_reserved_room);
+      $stmt_reserved_room->bind_param("i", $rev_no); 
+      $stmt_reserved_room->execute();
+      $result_reserved_room = $stmt_reserved_room->get_result();
       $stmt->close();
      }
     ?>
+
     <div class="overlay" id="popup-info">
       <div class="popup-box">
         <div class="container">
@@ -328,7 +336,14 @@ $result_customer_data = $stmt_customer_data->get_result();
                 <div class="list-info-box">
                   <dt class="list-dt">Room No.</dt>
                   <div class="column3">
-                    <dd class="list-dd"><?php echo $readResult['room_no']; ?></dd>
+                  <?php
+                  $all_rooms = array();
+                  $rowcount = mysqli_num_rows($result_reserved_room);
+                  while($rowcount > 0 && $row_room = mysqli_fetch_array($result_reserved_room)) {
+                    $all_rooms[] = $row_room['room_no'];
+                    $rowcount-=1;
+                  }
+                  echo  implode(", ", $all_rooms);?>
                   </div>
                 </div>
               </div>
